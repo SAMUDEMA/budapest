@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mappa e Guida Budapest - Surfing the Planet</title>
+  <title>Mappa e Guida Budapest - 3 Giorni e Mezzo</title>
   
   <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -53,7 +53,7 @@
     
     /* Sidebar sinistra */
     #sidebar {
-      width: 320px;
+      width: 340px;
       background: #ffffff;
       border-right: 1px solid #e0e0e0;
       overflow-y: auto;
@@ -68,21 +68,22 @@
     .day-header {
       padding: 12px 15px;
       font-weight: bold;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: white;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
+    .day-0-bg { background-color: #8e44ad; }
     .day-1-bg { background-color: #e74c3c; }
-    .day-2-bg { background-color: #3498db; }
+    .day-2-bg { background-color: #f39c12; }
     .day-3-bg { background-color: #2ecc71; }
     
     .place-list {
       list-style: none;
     }
     .place-item {
-      padding: 12px 15px;
+      padding: 10px 15px;
       border-bottom: 1px solid #f1f1f1;
       cursor: pointer;
       transition: background-color 0.2s;
@@ -93,30 +94,36 @@
       background-color: #f8f9fa;
     }
     .place-number {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: bold;
-      margin-right: 12px;
+      margin-right: 10px;
       flex-shrink: 0;
     }
     .place-info {
       flex: 1;
     }
     .place-name {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: #2c3e50;
     }
-    .place-desc {
+    .place-time {
       font-size: 0.75rem;
+      color: #e67e22;
+      font-weight: bold;
+      margin-top: 1px;
+    }
+    .place-desc {
+      font-size: 0.72rem;
       color: #7f8c8d;
-      margin-top: 2px;
+      margin-top: 1px;
     }
     
     /* Pannello Dettaglio Guida (Modal Slide-over) */
@@ -180,28 +187,28 @@
       background: rgba(255,255,255,0.25);
     }
     .guide-section {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
     .guide-section h3 {
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       color: #2c3e50;
       border-bottom: 2px solid #ecf0f1;
-      padding-bottom: 5px;
-      margin-bottom: 8px;
+      padding-bottom: 4px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
     .guide-section p, .guide-section ul {
-      font-size: 0.88rem;
-      line-height: 1.5;
+      font-size: 0.85rem;
+      line-height: 1.45;
       color: #555;
     }
     .guide-section ul {
       padding-left: 18px;
     }
     .guide-section li {
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     /* Marker Custom Styles */
@@ -214,7 +221,7 @@
       border-radius: 50%;
       border: 2px solid white;
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-      font-size: 12px;
+      font-size: 11px;
       cursor: pointer;
     }
     
@@ -240,25 +247,30 @@
 <body>
 
   <header>
-    <h1>Itinerario & Guida Budapest - 3 Giorni</h1>
-    <p>Guida completa con dettagli su ogni attrazione</p>
+    <h1>Itinerario & Guida Budapest</h1>
+    <p>Alloggio nel Distretto VII | Martedì 18:30 – Venerdì 20:00</p>
   </header>
 
   <div id="main-container">
     <!-- Elenco Laterale -->
     <div id="sidebar">
       <div class="day-section">
-        <div class="day-header day-1-bg">Giorno 1: Buda e Parlamento</div>
+        <div class="day-header day-0-bg">Martedì Sera: Arrivo nel Distretto VII</div>
+        <ul class="place-list" id="list-day-0"></ul>
+      </div>
+
+      <div class="day-section">
+        <div class="day-header day-1-bg">Mercoledì: Buda, Danubio e Crociera</div>
         <ul class="place-list" id="list-day-1"></ul>
       </div>
 
       <div class="day-section">
-        <div class="day-header day-2-bg">Giorno 2: Pest e Quartiere Ebraico</div>
+        <div class="day-header day-2-bg">Giovedì: Mercatini di Natale e Atmosfera</div>
         <ul class="place-list" id="list-day-2"></ul>
       </div>
 
       <div class="day-section">
-        <div class="day-header day-3-bg">Giorno 3: Terme e Viale Andrássy</div>
+        <div class="day-header day-3-bg">Venerdì: Parco, Terme e Partenza</div>
         <ul class="place-list" id="list-day-3"></ul>
       </div>
     </div>
@@ -275,11 +287,15 @@
       </div>
       <div class="panel-content">
         <div class="guide-section">
+          <h3>🕒 Orari e Spostamenti</h3>
+          <p id="panel-transit"></p>
+        </div>
+        <div class="guide-section">
           <h3>📖 Presentazione</h3>
           <p id="panel-about"></p>
         </div>
         <div class="guide-section">
-          <h3>✨ Cosa Vedere / Highlights</h3>
+          <h3>✨ Highlights & Attività</h3>
           <ul id="panel-highlights"></ul>
         </div>
         <div class="guide-section">
@@ -294,200 +310,219 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   
   <script>
-    // Dati dettagliati dei luoghi
+    // Dati dettagliati dell'itinerario personalizzato
     const itinerary = [
       {
-        day: 1,
-        color: '#e74c3c',
+        day: 0,
+        dayLabel: "Martedì Sera",
+        color: '#8e44ad',
         places: [
           {
             id: 1,
-            name: "Castello di Buda (Palazzo Reale)",
-            lat: 47.4962, lng: 19.0396,
-            shortDesc: "Residenza storica dei re ungheresi",
-            about: "Imponente complesso palaziale situato sulla collina di Buda. Originariamente costruito nel XIII secolo, è stato distrutto e ricostruito più volte. Oggi ospita importanti istituzioni culturali come la Galleria Nazionale Ungherese e il Museo Storico di Budapest.",
-            highlights: [
-              "I cortili panoramici con vista sulla città",
-              "La fontana di Re Mattia",
-              "La Galleria Nazionale Ungherese all'interno"
-            ],
-            tips: "L'accesso ai giardini e ai cortili esterni è gratuito. Puoi salire in cima con la storica Funicolare (Budavári Sikló) da Piazza Clark Ádám."
+            name: "Arrivo e Check-in (Distretto VII)",
+            lat: 47.4980, lng: 19.0640,
+            time: "18:30 – 20:30",
+            shortDesc: "Spostamento aeroporto -> Distretto VII e sistemazione",
+            transit: "45 min dall'aeroporto tramite bus Express 100E fino a Deák Ferenc tér, poi 8 min a piedi per l'alloggio.",
+            about: "Il Distretto VII (Erzsébetváros) è la zona più vivace e centrale di Pest, famosa per la sua concentrazione di locali, ristoranti e la vicinanza a tutte le principali linee di trasporto.",
+            highlights: ["Check-in in struttura", "Sistemazione bagagli"],
+            tips: "Acquistate il biglietto del bus 100E direttamente ai distributori automatici all'uscita del terminal dell'aeroporto o tramite app."
           },
           {
             id: 2,
-            name: "Chiesa di Mattia",
-            lat: 47.5022, lng: 19.0338,
-            shortDesc: "Famosa chiesa gotica dalle maioliche colorate",
-            about: "Una delle chiese più affascinanti ed eclettiche d'Europa. Risalente al XIV secolo, fu usata come moschea durante l'occupazione ottomana e successivamente ristrutturata in stile neogotico. È famosa per il suo tetto colorato con tegole in ceramica Zsolnay.",
-            highlights: [
-              "Il tetto unico con tegole policrome",
-              "Gli interni affrescati in toni caldi e oro",
-              "La torre campanaria da cui godere di una fantastica vista"
-            ],
-            tips: "L'ingresso è a pagamento. Si consiglia di acquistare il biglietto combinato che include la salita sulla torre."
-          },
+            name: "Szimpla Kert (Ruin Bar)",
+            lat: 47.4969, lng: 19.0632,
+            time: "20:30 in poi",
+            shortDesc: "Cena in zona e drink nel ruin pub più celebre",
+            transit: "Poche decine di metri a piedi dal vostro alloggio nel Distretto VII.",
+            about: "Il capostipite dei ruin pub di Budapest. Allestito all'interno di un vecchio edificio industriale abbandonato, è decorato con oggetti bizzarri di recupero, vecchie auto e opere d'arte eclettiche.",
+            highlights: ["Atmosfera unica e rilassata", "Bizzarro arredamento vintage e luci colorate"],
+            tips: "Arrivando attorno alle 20:30/21:00 troverete un'atmosfera perfetta senza dover fare troppa fila all'ingresso."
+          }
+        ]
+      },
+      {
+        day: 1,
+        dayLabel: "Mercoledì",
+        color: '#e74c3c',
+        places: [
           {
             id: 3,
-            name: "Bastione dei Pescatori",
-            lat: 47.5022, lng: 19.0348,
-            shortDesc: "Belvedere panoramico da favola sul Danubio",
-            about: "Costruito tra il 1895 e il 1902 in stile neogotico e neoromanico, questo monumento dall'aspetto fiabesco prende il nome dalla corporazione dei pescatori che nel Medioevo difendeva questo tratto di mura. Offre la vista panoramica più bella sul Parlamento e sul Danubio.",
-            highlights: [
-              "Le 7 torri bianche che simboleggiano le 7 tribù magiare",
-              "La statua equestre di Santo Stefano",
-              "La vista mozzafiato sul Parlamento di Pest"
-            ],
-            tips: "La maggior parte delle terrazze è ad accesso gratuito. Le torri superiori richiedono un piccolo biglietto, ma la vista è spettacolare da ogni punto."
+            name: "Castello di Buda (Palazzo Reale)",
+            lat: 47.4962, lng: 19.0396,
+            time: "09:30 – 11:00",
+            shortDesc: "Complesso Reale panoramico su Buda",
+            transit: "25-30 min a piedi dal Distretto VII attraversando il Ponte delle Catene + Funicolare o passeggiata in salita.",
+            about: "Storica residenza dei re ungheresi situata in cima alla collina. Dominando il Danubio, offre una delle viste più spettacolari su Pest.",
+            highlights: ["Cortili e bastioni panoramici esterni", "Fontana di Re Mattia", "Punti fotografici sul fiume"],
+            tips: "L'accesso a cortili e terrazze esterne è gratuito."
           },
           {
             id: 4,
-            name: "Ponte delle Catene",
-            lat: 47.4990, lng: 19.0437,
-            shortDesc: "Il ponte più antico e iconico di Budapest",
-            about: "Inaugurato nel 1849, è stato il primo ponte permanente a collegare le due città storiche di Buda e Pest, divise dal Danubio. Riconoscibile per i maestosi leoni in pietra posti a guardia delle due entrate.",
-            highlights: [
-              "Le imponenti sculture dei leoni all'ingresso",
-              "L'illuminazione serale suggestiva",
-              "La passeggiata pedonale tra Buda e Pest"
-            ],
-            tips: "Attraversalo a piedi al tramonto per scattare foto spettacolari sulle due sponde della città."
+            name: "Chiesa di Mattia & Bastione dei Pescatori",
+            lat: 47.5022, lng: 19.0348,
+            time: "11:15 – 12:30",
+            shortDesc: "Fiabesco belvedere e chiesa gotica decorata",
+            transit: "10 min di camminata (800 metri) lungo via Szent György utca dal Castello di Buda.",
+            about: "Il Bastione dei Pescatori è un monumento neogotico e neoromanico con 7 torri bianche. Accanto sorge la Chiesa di Mattia, nota per il tetto in maioliche colorate Zsolnay.",
+            highlights: ["Interni affrescati e dorati della Chiesa di Mattia", "Vista mozzafiato sul Parlamento dal Bastione"],
+            tips: "Il piano inferiore del Bastione è sempre gratuito e offre la stessa vista di quello superiore."
           },
           {
             id: 5,
             name: "Scarpe sulla riva del Danubio",
             lat: 47.5039, lng: 19.0448,
-            shortDesc: "Commovente memoriale dell'Olocausto",
-            about: "Creata dal regista Can Togay e dallo scultore Gyula Pauer, quest'opera d'arte concettuale comprende 60 paia di scarpe in ghisa modellate nello stile degli anni '40. Commemora gli ebrei fucilati dalla milizia delle Croci Frecciate e gettati nel fiume durante la Seconda Guerra Mondiale.",
-            highlights: [
-              "I dettagli realistici delle scarpe (da uomo, donna e bambino)",
-              "L'impatto emotivo e il profondo valore storico"
-            ],
-            tips: "Luogo di silenzio e raccoglimento. Spesso i visitatori lasciano candele o fiori all'interno delle scarpe."
+            shortDesc: "Memoriale toccante lungo le sponde di Pest",
+            about: "60 paia di scarpe in ghisa modellate nello stile degli anni '40, poste sul ciglio del fiume in memoria degli ebrei fucilati durante la Seconda Guerra Mondiale.",
+            transit: "25 min a piedi scendendo dalla collina di Buda e attraversando la sponda di Pest verso nord.",
+            highlights: ["Dettagli realistici delle sculture", "Profondo impatto emotivo"],
+            tips: "Luogo di rispetto e raccoglimento a pochissima distanza dal Parlamento."
           },
           {
             id: 6,
             name: "Parlamento di Budapest",
             lat: 47.5071, lng: 19.0456,
-            shortDesc: "Uno dei parlamenti più grandi e belli al mondo",
-            about: "Simbolo indiscusso della capitale ungherese, questo gigantesco edificio in stile neogotico è stato costruito per celebrare il millennio della nazione. Si estende per 268 metri lungo il Danubio e conta ben 691 stanze.",
-            highlights: [
-              "La Cupola centrale con la Sacra Corona Ungherese",
-              "Lo Scalone d'Onore ricoperto di tappeti rossi e oro",
-              "La Sala della Seduta Plenaria"
-            ],
-            tips: "La visita interna è possibile solo tramite tour guidati. È **obbligatorio prenotare i biglietti sul sito ufficiale con largo anticipo** (si esauriscono velocemente)."
+            time: "14:45 – 16:15",
+            shortDesc: "Uno degli edifici governativi più maestosi al mondo",
+            transit: "5 minuti a piedi (400 metri) dal memoriale delle Scarpe sul Danubio.",
+            about: "Icona di Budapest in stile neogotico. Lungo 268 metri sul fiume, racchiude al suo interno importanti tesori della storia ungherese.",
+            highlights: ["Scalone d'Onore decorato in oro", "Sala della Cupola e la Sacra Corona Ungherese"],
+            tips: "Visita guidata all'interno. È fondamentale prenotare i biglietti sul sito ufficiale in anticipo."
+          },
+          {
+            id: 7,
+            name: "Crociera Serale sul Danubio",
+            lat: 47.4940, lng: 19.0500,
+            time: "19:30 – 20:30",
+            shortDesc: "1 ora di navigazione tra i monumenti illuminati",
+            transit: "20-25 min a piedi dal Distretto VII fino ai moli d'imbarco sul fiume.",
+            about: "Esperienza fondamentale per vedere i monumenti più celebri (Parlamento, Castello, Ponti) completamente illuminati di notte.",
+            highlights: ["La vista del Parlamento illuminato dall'acqua", "Prospettiva panoramica su entrambi i lati della città"],
+            tips: "Copritevi bene per godervi il ponte esterno all'aperto delle imbarcazioni."
           }
         ]
       },
       {
         day: 2,
-        color: '#3498db',
+        dayLabel: "Giovedì",
+        color: '#f39c12',
         places: [
           {
-            id: 7,
+            id: 8,
             name: "Basilica di Santo Stefano",
             lat: 47.5009, lng: 19.0540,
-            shortDesc: "La chiesa più grande della capitale",
-            about: "Co-cattedrale intitolata a Santo Stefano, primo re d'Ungheria. L'edificio è alto 96 metri, la stessa identica altezza del Parlamento, simboleggiando la parità tra potere spirituale e temporale.",
-            highlights: [
-              "La cappella che custodisce la 'Santa Destra' (la mummia della mano del Re Stefano)",
-              "I ricchi decori in marmo ed oro degli interni",
-              "La cupola panoramica a 360° sulla città"
-            ],
-            tips: "Puoi salire sulla cupola tramite ascensore o facendo circa 300 gradini per godere di una vista eccezionale su Pest."
-          },
-          {
-            id: 8,
-            name: "Grande Sinagoga di via Dohány",
-            lat: 47.4959, lng: 19.0606,
-            shortDesc: "La sinagoga più grande d'Europa",
-            about: "Costruita a metà dell'Ottocento in stile neo-moresco, può ospitare oltre 3.000 persone. Il complesso comprende la sinagoga, il Museo Ebraico, il Tempio degli Eroi e il cimitero commemorativo.",
-            highlights: [
-              "Gli interni monumentali simili ad una cattedrale",
-              "L'Albero della Vita (scultura in metallo con le foglie incise coi nomi delle vittime dell'Olocausto)",
-              "Il Museo Ebraico adiacente"
-            ],
-            tips: "È richiesto un abbigliamento decoroso (spalle e ginocchia coperte, e kippah per gli uomini fornita all'ingresso). Chiusa il sabato per lo Shabbat."
+            time: "09:50 – 11:15",
+            shortDesc: "La cattedrale principale della capitale",
+            transit: "18-20 min a piedi dal Distretto VII.",
+            about: "La chiesa più grande di Budapest. Dedicata al primo re d'Ungheria, custodisce la sua reliquia e offre una bellissima terrazza panoramica sulla cupola.",
+            highlights: ["Interni in marmo e oro", "La Cappella della Santa Destra", "Vista a 360° dalla cupola"],
+            tips: "Inclusa la salita in ascensore sulla cupola per ammirare la città dall'alto."
           },
           {
             id: 9,
-            name: "New York Café",
-            lat: 47.4984, lng: 19.0701,
-            shortDesc: "Considerato il caffè più bello del mondo",
-            about: "Inaugurato nel 1894, questo caffè in stile rinascimentale e barocco era il punto di ritrovo preferito di poeti, scrittori ed artisti ungheresi. Con i suoi affreschi, le colonne in marmo tortili e i lampadari in cristallo sembra una vera sala da ballo reale.",
-            highlights: [
-              "Gli opulenti soffitti affrescati e gli ori",
-              "L'atmosfera d'altri tempi con musica dal vivo (pianoforte o violino)"
-            ],
-            tips: "I prezzi sono superiori alla media della città. Per evitare ore di fila all'esterno, prenotate un tavolo online dal loro sito con qualche giorno di anticipo."
+            name: "Mercatino di Natale della Basilica (Advent Basilica)",
+            lat: 47.5005, lng: 19.0535,
+            time: "11:15 – 13:30",
+            shortDesc: "Mercatino natalizio premiato tra i più belli d'Europa",
+            transit: "0 minuti (si trova direttamente davanti alla facciata della Basilica).",
+            about: "Mercatino fiabesco allestito nella piazza con pista di pattinaggio, grande albero decorato, bancarelle d'artigianato locale e street food tipico.",
+            highlights: ["Degustazione di Lángos, Gulasch servito nel pane e Kürtőskalács", "Artigianato in legno e ceramica"],
+            tips: "Pranzate direttamente tra le bancarelle provando il vin brulè ungherese (*Forralt bor*)."
           },
           {
             id: 10,
-            name: "Szimpla Kert (Ruin Bar)",
-            lat: 47.4969, lng: 19.0632,
-            shortDesc: "Il famoso e originale bar tra le rovine",
-            about: "Il pioniere dei celebri *Ruin Pubs* di Budapest. Allestito all'interno di un palazzo diroccato ed abbandonato nel Quartiere Ebraico, è stato arredato con oggetti di recupero eclettici: vecchie auto tagliate a metà, vasche da bagno riutilizzate come divani e luci vintage.",
-            highlights: [
-              "L'arredamento artistico, bizzarro e stravagante",
-              "Il cortile interno all'aperto",
-              "Il mercato della domenica mattina con prodotti locali"
-            ],
-            tips: "Fantastico sia di giorno per fare foto e bere un caffè, sia di sera per vivere la movida locale."
+            name: "Fashion Street & Mercatino Piazza Vörösmarty",
+            lat: 47.4965, lng: 19.0505,
+            time: "13:30 – 15:30",
+            shortDesc: "Il mercatino più antico e la via delle luminarie",
+            transit: "Passeggiata di 10-15 min lungo Fashion Street (Deák Ferenc utca) completamente addobbata.",
+            about: "Piazza Vörösmarty ospita il mercatino di Natale più storico di Budapest, collegato alla Basilica da una via completamente illuminata a festa.",
+            highlights: ["Installazioni luminose giganti su Fashion Street", "Atmosfera festosa e banchetti di dolci tipici"],
+            tips: "Approfittatene per scaldarvi con un caffè allo storico Café Gerbeaud situato sulla piazza."
+          },
+          {
+            id: 11,
+            name: "New York Café",
+            lat: 47.4984, lng: 19.0701,
+            time: "16:00 – 17:30",
+            shortDesc: "Pausa caffè nel salone d'epoca più bello del mondo",
+            transit: "20 min a piedi da Piazza Vörösmarty (oppure 10 min col bus/tram 47/49).",
+            about: "Inaugurato nel 1894, offre saloni ricoperti di opulenti affreschi, marmi e lampadari in cristallo. Un tuffo nell'atmosfera imperiale d'altri tempi.",
+            highlights: ["Affreschi e decorazioni barocche", "Musica dal vivo con pianoforte e violini"],
+            tips: "Si consiglia vivamente di effettuare la prenotazione online con anticipo sul loro sito."
+          },
+          {
+            id: 12,
+            name: "Spettacolo Proiezioni 3D sulla Basilica",
+            lat: 47.5009, lng: 19.0540,
+            time: "17:45 – 19:00",
+            shortDesc: "Proiezioni luminose natalizie sulla facciata",
+            transit: "15 min con la Metro M2 da Blaha Lujza tér fino a Deák/Basilica.",
+            about: "Al calare della sera, la facciata della Basilica prende vita grazie a spettacolari proiezioni video in 3D a tema natalizio accompagnate da musica.",
+            highlights: ["Giochi di luce 3D sulla cattedrale", "Magica atmosfera serale con le luminarie accese"],
+            tips: "Gli spettacoli si ripetono ogni 30 minuti a partire dalle 16:30/17:00."
           }
         ]
       },
       {
         day: 3,
+        dayLabel: "Venerdì",
         color: '#2ecc71',
         places: [
           {
-            id: 11,
-            name: "Piazza degli Eroi (Hősök tere)",
-            lat: 47.5149, lng: 19.0778,
-            shortDesc: "Monumento celebrativo dei fondatori della nazione",
-            about: "Una delle piazze più imponenti e importanti di Budapest, situata alla fine di Viale Andrássy. Al centro si erge la colonna alta 36 metri con l'Arcangelo Gabriele, circondata dai colonnati con le statue dei sovrani e degli eroi ungheresi.",
-            highlights: [
-              "Il Monumento del Millennio",
-              "I due maestosi edifici museali ai lati: il Museo di Belle Arti e la Galleria d'Arte"
-            ],
-            tips: "Perfetta da visitare prima di inoltrarsi nel parco Városliget per andare alle terme."
-          },
-          {
-            id: 12,
-            name: "Parco Városliget e Castello Vajdahunyad",
-            lat: 47.5158, lng: 19.0825,
-            shortDesc: "Parco cittadino e fiabesco castello",
-            about: "Il polmone verde di Budapest. Al suo interno ospita il Castello di Vajdahunyad, costruito nel 1896 ricopiando diversi stili architettonici ungheresi (romanico, gotico, rinascimentale e barocco) e circondato da un idilliaco laghetto.",
-            highlights: [
-              "Il cortile interno del Castello di Vajdahunyad",
-              "La statua misteriosa dell'Anonimo (lo storico re ungherese)",
-              "Il lago (per pedalò d'estate o pattinaggio su ghiaccio d'inverno)"
-            ],
-            tips: "Passeggiata rilassante ideale dopo la visita a Piazza degli Eroi."
-          },
-          {
             id: 13,
-            name: "Terme Széchenyi",
-            lat: 47.5188, lng: 19.0814,
-            shortDesc: "Famosissimo complesso termale all'aperto",
-            about: "Uno dei complessi termali più grandi d'Europa. Ospitato in un magnifico palazzo neobaroque giallo, trae acqua da sorgenti termali calde naturali richiamando visitatori da tutto il mondo.",
-            highlights: [
-              "Le iconiche vasche esterne d'acqua calda a 38°C (famose per la gente che gioca a scacchi in acqua)",
-              "Oltre 15 vasche interne con diverse temperature, saune e bagni turchi"
-            ],
-            tips: "Porta con te asciugamano, ciabatte e cuffia (obbligatoria solo nella vasca olimpionica). Acquista il biglietto 'fast-track' online per saltare le lunghe code all'ingresso."
+            name: "Viale Andrássy & Teatro dell'Opera",
+            lat: 47.5026, lng: 19.0583,
+            time: "09:30 – 10:45",
+            shortDesc: "Elegante viale alberato patrimonio UNESCO",
+            transit: "10 min a piedi dal Distretto VII per raggiungere il viale.",
+            about: "Il viale più prestigioso di Pest, fiancheggiato da magnifici palazzi rinascimentali, boutique e l'imponente Teatro dell'Opera di Stato.",
+            highlights: ["Facciata del Teatro dell'Opera di Stato", "Architetture storiche d'epoca"],
+            tips: "Prendete la storica linea M1 della metro dalla fermata 'Opera' per proseguire verso il parco."
           },
           {
             id: 14,
-            name: "Viale Andrássy e Teatro dell'Opera",
-            lat: 47.5026, lng: 19.0583,
-            shortDesc: "Elegante viale alberato patrimonio UNESCO",
-            about: "Il viale più elegante di Budapest, spesso paragonato agli Champs-Élysées di Parigi. Collega il centro città con Piazza degli Eroi ed è affiancato da palazzi rinascimentali, boutique di alta moda e il Teatro dell'Opera di Stato.",
-            highlights: [
-              "Il Teatro dell'Opera di Stato Ungherese (neo-rinascimentale)",
-              "La storicità della linea M1 della metropolitana (la più antica dell'Europa continentale) che scorre proprio sotto il viale"
-            ],
-            tips: "Puoi percorrere a piedi il viale o salire sulla linea gialla M1 della metro per provare i suoi storici vagoni in legno."
+            name: "Piazza degli Eroi (Hősök tere)",
+            lat: 47.5149, lng: 19.0778,
+            time: "11:00 – 12:00",
+            shortDesc: "Complesso statuario celebrativo dei Re ungheresi",
+            transit: "12 min di metropolitana M1 (linea storica gialla) dall'Opera a Hősök tere.",
+            about: "Monumentale piazza dominata dalla colonna dell'Arcangelo Gabriele e dalle statue delle 7 tribù magiare e dei re ungheresi.",
+            highlights: ["Monumento del Millennio", "Sculture degli eroi della nazione"],
+            tips: "Ottimo punto per foto panoramiche prima di entrare nel parco."
+          },
+          {
+            id: 15,
+            name: "Parco Városliget e Castello Vajdahunyad",
+            lat: 47.5158, lng: 19.0825,
+            time: "12:00 – 13:15",
+            shortDesc: "Parco cittadino e castello incantato sul lago",
+            transit: "5 minuti a piedi da Piazza degli Eroi nel cuore del parco.",
+            about: "Un grande castello nato per celebrare vari stili architettonici ungheresi (romanico, gotico, barocco), circondato da un idilliaco laghetto.",
+            highlights: ["Passeggiata nei cortili del Castello Vajdahunyad", "Statua dell'Anonimo"],
+            tips: "In inverno il lago adiacente si trasforma nella famosa pista di pattinaggio su ghiaccio all'aperto."
+          },
+          {
+            id: 16,
+            name: "Terme Széchenyi",
+            lat: 47.5188, lng: 19.0814,
+            time: "14:00 – 16:45",
+            shortDesc: "Famosissimo bagno termale all'aperto con acqua calda",
+            transit: "5 minuti a piedi all'interno del parco dal Castello alle Terme.",
+            about: "Storico stabilimento termale neobaroque giallo. Famossissimo per le sue vasche esterne fumanti a 38°C fruibili in qualsiasi stagione.",
+            highlights: ["Bagno nelle vasche calde esterne", "Saune e bagni turchi interni"],
+            tips: "Includete il biglietto salta-fila online. Ricordate di portare ciabatte e asciugamano."
+          },
+          {
+            id: 17,
+            name: "Recupero Bagagli & Spostamento Aeroporto",
+            lat: 47.4980, lng: 19.0640,
+            time: "16:45 – 18:00",
+            shortDesc: "Rientro al Distretto VII e corsa per il volo",
+            transit: "15 min con Metro M1 dalle Terme al Distretto VII per bagagli + 45 min con bus Express 100E per l'aeroporto.",
+            about: "Rientro in alloggio per recuperare le valigie lasciate in deposito e trasferimento diretto all'aeroporto di Budapest (BUD) per il volo delle 20:00.",
+            highlights: ["Puntualità per i controlli in aeroporto (arrivo ore 18:00)"],
+            tips: "I bus Express 100E partono da Deák Ferenc tér ogni 7-10 minuti."
           }
         ]
       }
@@ -515,6 +550,7 @@
           <div class="place-number" style="background-color: ${dayData.color}">${place.id}</div>
           <div class="place-info">
             <div class="place-name">${place.name}</div>
+            <div class="place-time">${place.time || ''}</div>
             <div class="place-desc">${place.shortDesc}</div>
           </div>
         `;
@@ -529,9 +565,9 @@
         // Icona Marker
         const customIcon = L.divIcon({
           className: 'custom-marker',
-          html: `<div class="custom-marker" style="background-color: ${dayData.color}; width: 28px; height: 28px;">${place.id}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
+          html: `<div class="custom-marker" style="background-color: ${dayData.color}; width: 26px; height: 26px;">${place.id}</div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 13]
         });
 
         // Marker Mappa
@@ -556,8 +592,9 @@
       const dayBadge = document.getElementById('panel-day');
       
       header.style.backgroundColor = dayData.color;
-      dayBadge.textContent = `Giorno ${dayData.day}`;
+      dayBadge.textContent = `${dayData.dayLabel}`;
       document.getElementById('panel-title').textContent = place.name;
+      document.getElementById('panel-transit').textContent = `${place.time ? '🕒 ' + place.time + ' | ' : ''}${place.transit}`;
       document.getElementById('panel-about').textContent = place.about;
       
       // Lista Highlights
