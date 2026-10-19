@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mappa e Guida Budapest - Surfing the Planet</title>
+  
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #333;
+      background-color: #f8f9fa;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      background-color: #1a252f;
+      color: #fff;
+      padding: 12px 20px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    header p {
+      font-size: 0.85rem;
+      color: #bdc3c7;
+      margin-top: 2px;
+    }
+    #main-container {
+      display: flex;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    #map {
+      flex: 1;
+      height: 100%;
+      z-index: 1;
+    }
+    
+    /* Sidebar sinistra */
+    #sidebar {
+      width: 320px;
+      background: #ffffff;
+      border-right: 1px solid #e0e0e0;
+      overflow-y: auto;
+      z-index: 2;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .day-section {
+      border-bottom: 1px solid #eee;
+    }
+    .day-header {
+      padding: 12px 15px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .day-1-bg { background-color: #e74c3c; }
+    .day-2-bg { background-color: #3498db; }
+    .day-3-bg { background-color: #2ecc71; }
+    
+    .place-list {
+      list-style: none;
+    }
+    .place-item {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f1f1f1;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .place-item:hover {
+      background-color: #f8f9fa;
+    }
+    .place-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .place-info {
+      flex: 1;
+    }
+    .place-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    .place-desc {
+      font-size: 0.75rem;
+      color: #7f8c8d;
+      margin-top: 2px;
+    }
+    
+    /* Pannello Dettaglio Guida (Modal Slide-over) */
+    #detail-panel {
+      position: absolute;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100%;
+      background: white;
+      box-shadow: -4px 0 15px rgba(0,0,0,0.15);
+      z-index: 2000;
+      transition: right 0.3s ease-in-out;
+      display: flex;
+      flex-direction: column;
+    }
+    #detail-panel.active {
+      right: 0;
+    }
+    .panel-header {
+      padding: 20px;
+      color: white;
+      position: relative;
+    }
+    .panel-header h2 {
+      font-size: 1.25rem;
+      margin-top: 5px;
+      padding-right: 25px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0,0,0,0.2);
+      border: none;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .close-btn:hover {
+      background: rgba(0,0,0,0.4);
+    }
+    .panel-content {
+      padding: 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    .badge-day {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.25);
+    }
+    .guide-section {
+      margin-bottom: 20px;
+    }
+    .guide-section h3 {
+      font-size: 0.95rem;
+      color: #2c3e50;
+      border-bottom: 2px solid #ecf0f1;
+      padding-bottom: 5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .guide-section p, .guide-section ul {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #555;
+    }
+    .guide-section ul {
+      padding-left: 18px;
+    }
+    .guide-section li {
+      margin-bottom: 4px;
+    }
+
+    /* Marker Custom Styles */
+    .custom-marker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      font-size: 12px;
+      cursor: pointer;
+    }
+    
+    /* Responsive adjustment */
+    @media (max-width: 768px) {
+      #main-container {
+        flex-direction: column-reverse;
+      }
+      #sidebar {
+        width: 100%;
+        height: 35vh;
+      }
+      #map {
+        height: 65vh;
+      }
+      #detail-panel {
+        width: 100%;
+        right: -100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Itinerario & Guida Budapest - 3 Giorni</h1>
+    <p>Guida completa con dettagli su ogni attrazione</p>
+  </header>
+
+  <div id="main-container">
+    <!-- Elenco Laterale -->
+    <div id="sidebar">
+      <div class="day-section">
+        <div class="day-header day-1-bg">Giorno 1: Buda e Parlamento</div>
+        <ul class="place-list" id="list-day-1"></ul>
+      </div>
+
+      <div class="day-section">
+        <div class="day-header day-2-bg">Giorno 2: Pest e Quartiere Ebraico</div>
+        <ul class="place-list" id="list-day-2"></ul>
+      </div>
+
+      <div class="day-section">
+        <div class="day-header day-3-bg">Giorno 3: Terme e Viale Andrássy</div>
+        <ul class="place-list" id="list-day-3"></ul>
+      </div>
+    </div>
+
+    <!-- Mappa Interattiva -->
+    <div id="map"></div>
+
+    <!-- Pannello Guida Dettagliata (si apre al click) -->
+    <div id="detail-panel">
+      <div class="panel-header" id="panel-header">
+        <button class="close-btn" id="close-panel">&times;</button>
+        <span class="badge-day" id="panel-day">Giorno 1</span>
+        <h2 id="panel-title">Nome Luogo</h2>
+      </div>
+      <div class="panel-content">
+        <div class="guide-section">
+          <h3>📖 Presentazione</h3>
+          <p id="panel-about"></p>
+        </div>
+        <div class="guide-section">
+          <h3>✨ Cosa Vedere / Highlights</h3>
+          <ul id="panel-highlights"></ul>
+        </div>
+        <div class="guide-section">
+          <h3>💡 Consigli Pratici</h3>
+          <p id="panel-tips"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <script>
+    // Dati dettagliati dei luoghi
+    const itinerary = [
+      {
+        day: 1,
+        color: '#e74c3c',
+        places: [
+          {
+            id: 1,
+            name: "Castello di Buda (Palazzo Reale)",
+            lat: 47.4962, lng: 19.0396,
+            shortDesc: "Residenza storica dei re ungheresi",
+            about: "Imponente complesso palaziale situato sulla collina di Buda. Originariamente costruito nel XIII secolo, è stato distrutto e ricostruito più volte. Oggi ospita importanti istituzioni culturali come la Galleria Nazionale Ungherese e il Museo Storico di Budapest.",
+            highlights: [
+              "I cortili panoramici con vista sulla città",
+              "La fontana di Re Mattia",
+              "La Galleria Nazionale Ungherese all'interno"
+            ],
+            tips: "L'accesso ai giardini e ai cortili esterni è gratuito. Puoi salire in cima con la storica Funicolare (Budavári Sikló) da Piazza Clark Ádám."
+          },
+          {
+            id: 2,
+            name: "Chiesa di Mattia",
+            lat: 47.5022, lng: 19.0338,
+            shortDesc: "Famosa chiesa gotica dalle maioliche colorate",
+            about: "Una delle chiese più affascinanti ed eclettiche d'Europa. Risalente al XIV secolo, fu usata come moschea durante l'occupazione ottomana e successivamente ristrutturata in stile neogotico. È famosa per il suo tetto colorato con tegole in ceramica Zsolnay.",
+            highlights: [
+              "Il tetto unico con tegole policrome",
+              "Gli interni affrescati in toni caldi e oro",
+              "La torre campanaria da cui godere di una fantastica vista"
+            ],
+            tips: "L'ingresso è a pagamento. Si consiglia di acquistare il biglietto combinato che include la salita sulla torre."
+          },
+          {
+            id: 3,
+            name: "Bastione dei Pescatori",
+            lat: 47.5022, lng: 19.0348,
+            shortDesc: "Belvedere panoramico da favola sul Danubio",
+            about: "Costruito tra il 1895 e il 1902 in stile neogotico e neoromanico, questo monumento dall'aspetto fiabesco prende il nome dalla corporazione dei pescatori che nel Medioevo difendeva questo tratto di mura. Offre la vista panoramica più bella sul Parlamento e sul Danubio.",
+            highlights: [
+              "Le 7 torri bianche che simboleggiano le 7 tribù magiare",
+              "La statua equestre di Santo Stefano",
+              "La vista mozzafiato sul Parlamento di Pest"
+            ],
+            tips: "La maggior parte delle terrazze è ad accesso gratuito. Le torri superiori richiedono un piccolo biglietto, ma la vista è spettacolare da ogni punto."
+          },
+          {
+            id: 4,
+            name: "Ponte delle Catene",
+            lat: 47.4990, lng: 19.0437,
+            shortDesc: "Il ponte più antico e iconico di Budapest",
+            about: "Inaugurato nel 1849, è stato il primo ponte permanente a collegare le due città storiche di Buda e Pest, divise dal Danubio. Riconoscibile per i maestosi leoni in pietra posti a guardia delle due entrate.",
+            highlights: [
+              "Le imponenti sculture dei leoni all'ingresso",
+              "L'illuminazione serale suggestiva",
+              "La passeggiata pedonale tra Buda e Pest"
+            ],
+            tips: "Attraversalo a piedi al tramonto per scattare foto spettacolari sulle due sponde della città."
+          },
+          {
+            id: 5,
+            name: "Scarpe sulla riva del Danubio",
+            lat: 47.5039, lng: 19.0448,
+            shortDesc: "Commovente memoriale dell'Olocausto",
+            about: "Creata dal regista Can Togay e dallo scultore Gyula Pauer, quest'opera d'arte concettuale comprende 60 paia di scarpe in ghisa modellate nello stile degli anni '40. Commemora gli ebrei fucilati dalla milizia delle Croci Frecciate e gettati nel fiume durante la Seconda Guerra Mondiale.",
+            highlights: [
+              "I dettagli realistici delle scarpe (da uomo, donna e bambino)",
+              "L'impatto emotivo e il profondo valore storico"
+            ],
+            tips: "Luogo di silenzio e raccoglimento. Spesso i visitatori lasciano candele o fiori all'interno delle scarpe."
+          },
+          {
+            id: 6,
+            name: "Parlamento di Budapest",
+            lat: 47.5071, lng: 19.0456,
+            shortDesc: "Uno dei parlamenti più grandi e belli al mondo",
+            about: "Simbolo indiscusso della capitale ungherese, questo gigantesco edificio in stile neogotico è stato costruito per celebrare il millennio della nazione. Si estende per 268 metri lungo il Danubio e conta ben 691 stanze.",
+            highlights: [
+              "La Cupola centrale con la Sacra Corona Ungherese",
+              "Lo Scalone d'Onore ricoperto di tappeti rossi e oro",
+              "La Sala della Seduta Plenaria"
+            ],
+            tips: "La visita interna è possibile solo tramite tour guidati. È **obbligatorio prenotare i biglietti sul sito ufficiale con largo anticipo** (si esauriscono velocemente)."
+          }
+        ]
+      },
+      {
+        day: 2,
+        color: '#3498db',
+        places: [
+          {
+            id: 7,
+            name: "Basilica di Santo Stefano",
+            lat: 47.5009, lng: 19.0540,
+            shortDesc: "La chiesa più grande della capitale",
+            about: "Co-cattedrale intitolata a Santo Stefano, primo re d'Ungheria. L'edificio è alto 96 metri, la stessa identica altezza del Parlamento, simboleggiando la parità tra potere spirituale e temporale.",
+            highlights: [
+              "La cappella che custodisce la 'Santa Destra' (la mummia della mano del Re Stefano)",
+              "I ricchi decori in marmo ed oro degli interni",
+              "La cupola panoramica a 360° sulla città"
+            ],
+            tips: "Puoi salire sulla cupola tramite ascensore o facendo circa 300 gradini per godere di una vista eccezionale su Pest."
+          },
+          {
+            id: 8,
+            name: "Grande Sinagoga di via Dohány",
+            lat: 47.4959, lng: 19.0606,
+            shortDesc: "La sinagoga più grande d'Europa",
+            about: "Costruita a metà dell'Ottocento in stile neo-moresco, può ospitare oltre 3.000 persone. Il complesso comprende la sinagoga, il Museo Ebraico, il Tempio degli Eroi e il cimitero commemorativo.",
+            highlights: [
+              "Gli interni monumentali simili ad una cattedrale",
+              "L'Albero della Vita (scultura in metallo con le foglie incise coi nomi delle vittime dell'Olocausto)",
+              "Il Museo Ebraico adiacente"
+            ],
+            tips: "È richiesto un abbigliamento decoroso (spalle e ginocchia coperte, e kippah per gli uomini fornita all'ingresso). Chiusa il sabato per lo Shabbat."
+          },
+          {
+            id: 9,
+            name: "New York Café",
+            lat: 47.4984, lng: 19.0701,
+            shortDesc: "Considerato il caffè più bello del mondo",
+            about: "Inaugurato nel 1894, questo caffè in stile rinascimentale e barocco era il punto di ritrovo preferito di poeti, scrittori ed artisti ungheresi. Con i suoi affreschi, le colonne in marmo tortili e i lampadari in cristallo sembra una vera sala da ballo reale.",
+            highlights: [
+              "Gli opulenti soffitti affrescati e gli ori",
+              "L'atmosfera d'altri tempi con musica dal vivo (pianoforte o violino)"
+            ],
+            tips: "I prezzi sono superiori alla media della città. Per evitare ore di fila all'esterno, prenotate un tavolo online dal loro sito con qualche giorno di anticipo."
+          },
+          {
+            id: 10,
+            name: "Szimpla Kert (Ruin Bar)",
+            lat: 47.4969, lng: 19.0632,
+            shortDesc: "Il famoso e originale bar tra le rovine",
+            about: "Il pioniere dei celebri *Ruin Pubs* di Budapest. Allestito all'interno di un palazzo diroccato ed abbandonato nel Quartiere Ebraico, è stato arredato con oggetti di recupero eclettici: vecchie auto tagliate a metà, vasche da bagno riutilizzate come divani e luci vintage.",
+            highlights: [
+              "L'arredamento artistico, bizzarro e stravagante",
+              "Il cortile interno all'aperto",
+              "Il mercato della domenica mattina con prodotti locali"
+            ],
+            tips: "Fantastico sia di giorno per fare foto e bere un caffè, sia di sera per vivere la movida locale."
+          }
+        ]
+      },
+      {
+        day: 3,
+        color: '#2ecc71',
+        places: [
+          {
+            id: 11,
+            name: "Piazza degli Eroi (Hősök tere)",
+            lat: 47.5149, lng: 19.0778,
+            shortDesc: "Monumento celebrativo dei fondatori della nazione",
+            about: "Una delle piazze più imponenti e importanti di Budapest, situata alla fine di Viale Andrássy. Al centro si erge la colonna alta 36 metri con l'Arcangelo Gabriele, circondata dai colonnati con le statue dei sovrani e degli eroi ungheresi.",
+            highlights: [
+              "Il Monumento del Millennio",
+              "I due maestosi edifici museali ai lati: il Museo di Belle Arti e la Galleria d'Arte"
+            ],
+            tips: "Perfetta da visitare prima di inoltrarsi nel parco Városliget per andare alle terme."
+          },
+          {
+            id: 12,
+            name: "Parco Városliget e Castello Vajdahunyad",
+            lat: 47.5158, lng: 19.0825,
+            shortDesc: "Parco cittadino e fiabesco castello",
+            about: "Il polmone verde di Budapest. Al suo interno ospita il Castello di Vajdahunyad, costruito nel 1896 ricopiando diversi stili architettonici ungheresi (romanico, gotico, rinascimentale e barocco) e circondato da un idilliaco laghetto.",
+            highlights: [
+              "Il cortile interno del Castello di Vajdahunyad",
+              "La statua misteriosa dell'Anonimo (lo storico re ungherese)",
+              "Il lago (per pedalò d'estate o pattinaggio su ghiaccio d'inverno)"
+            ],
+            tips: "Passeggiata rilassante ideale dopo la visita a Piazza degli Eroi."
+          },
+          {
+            id: 13,
+            name: "Terme Széchenyi",
+            lat: 47.5188, lng: 19.0814,
+            shortDesc: "Famosissimo complesso termale all'aperto",
+            about: "Uno dei complessi termali più grandi d'Europa. Ospitato in un magnifico palazzo neobaroque giallo, trae acqua da sorgenti termali calde naturali richiamando visitatori da tutto il mondo.",
+            highlights: [
+              "Le iconiche vasche esterne d'acqua calda a 38°C (famose per la gente che gioca a scacchi in acqua)",
+              "Oltre 15 vasche interne con diverse temperature, saune e bagni turchi"
+            ],
+            tips: "Porta con te asciugamano, ciabatte e cuffia (obbligatoria solo nella vasca olimpionica). Acquista il biglietto 'fast-track' online per saltare le lunghe code all'ingresso."
+          },
+          {
+            id: 14,
+            name: "Viale Andrássy e Teatro dell'Opera",
+            lat: 47.5026, lng: 19.0583,
+            shortDesc: "Elegante viale alberato patrimonio UNESCO",
+            about: "Il viale più elegante di Budapest, spesso paragonato agli Champs-Élysées di Parigi. Collega il centro città con Piazza degli Eroi ed è affiancato da palazzi rinascimentali, boutique di alta moda e il Teatro dell'Opera di Stato.",
+            highlights: [
+              "Il Teatro dell'Opera di Stato Ungherese (neo-rinascimentale)",
+              "La storicità della linea M1 della metropolitana (la più antica dell'Europa continentale) che scorre proprio sotto il viale"
+            ],
+            tips: "Puoi percorrere a piedi il viale o salire sulla linea gialla M1 della metro per provare i suoi storici vagoni in legno."
+          }
+        ]
+      }
+    ];
+
+    // Inizializzazione Mappa
+    const map = L.map('map').setView([47.503, 19.055], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18
+    }).addTo(map);
+
+    const markers = {};
+
+    // Popolamento Lista e Marker
+    itinerary.forEach(dayData => {
+      const listContainer = document.getElementById(`list-day-${dayData.day}`);
+      
+      dayData.places.forEach((place) => {
+        // Elemento lista
+        const li = document.createElement('li');
+        li.className = 'place-item';
+        li.innerHTML = `
+          <div class="place-number" style="background-color: ${dayData.color}">${place.id}</div>
+          <div class="place-info">
+            <div class="place-name">${place.name}</div>
+            <div class="place-desc">${place.shortDesc}</div>
+          </div>
+        `;
+        
+        // Click su voce della lista
+        li.addEventListener('click', () => {
+          openGuidePanel(place, dayData);
+        });
+
+        listContainer.appendChild(li);
+
+        // Icona Marker
+        const customIcon = L.divIcon({
+          className: 'custom-marker',
+          html: `<div class="custom-marker" style="background-color: ${dayData.color}; width: 28px; height: 28px;">${place.id}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        // Marker Mappa
+        const marker = L.marker([place.lat, place.lng], { icon: customIcon }).addTo(map);
+        
+        marker.on('click', () => {
+          openGuidePanel(place, dayData);
+        });
+
+        markers[place.id] = marker;
+      });
+    });
+
+    // Funzione per aprire il pannello guida
+    function openGuidePanel(place, dayData) {
+      // Centra la mappa sul marker selezionato
+      map.flyTo([place.lat, place.lng], 16, { duration: 1.0 });
+
+      // Aggiorna contenuti pannello
+      const panel = document.getElementById('detail-panel');
+      const header = document.getElementById('panel-header');
+      const dayBadge = document.getElementById('panel-day');
+      
+      header.style.backgroundColor = dayData.color;
+      dayBadge.textContent = `Giorno ${dayData.day}`;
+      document.getElementById('panel-title').textContent = place.name;
+      document.getElementById('panel-about').textContent = place.about;
+      
+      // Lista Highlights
+      const hlContainer = document.getElementById('panel-highlights');
+      hlContainer.innerHTML = '';
+      place.highlights.forEach(hl => {
+        const li = document.createElement('li');
+        li.textContent = hl;
+        hlContainer.appendChild(li);
+      });
+
+      document.getElementById('panel-tips').textContent = place.tips;
+
+      // Apri pannello
+      panel.classList.add('active');
+    }
+
+    // Chiusura pannello
+    document.getElementById('close-panel').addEventListener('click', () => {
+      document.getElementById('detail-panel').classList.remove('active');
+    });
+
+    // Regolazione automatica dei confini della mappa
+    const allCoords = itinerary.flatMap(d => d.places.map(p => [p.lat, p.lng]));
+    map.fitBounds(allCoords, { padding: [40, 40] });
+  </script>
+</body>
+</html>
